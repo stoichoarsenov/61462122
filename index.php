@@ -31,9 +31,10 @@ $currDate = date('Y-m-d');
 $taskErr = $dueDateErr = '';
 $error == false;
 
-foreach ($_POST['cars'] as $cars)
-//$cars = $_POST['cars'];
-    var_dump($cars);
+foreach ($_POST['users'] as $users){
+    $user = $_POST['users'];
+}
+//    var_dump($user);
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
@@ -47,17 +48,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $error == true;
     }
     if ($error == false) {
-        save_reg($_POST['tasks'], $_POST['dueDate'], $_POST['status'], $conn);
+        save_reg($_POST['tasks'], $_POST['dueDate'], $_POST['status'], $user , $conn);
     }
 
 }
 
-function save_reg($task, $dueDate, $status, $conn)
+function save_reg($task, $dueDate, $status, $user, $conn)
 {
-    $sqlTaskInsert = "INSERT INTO `Task` (`task`, `dueDate`, `status`)VALUES('" . $task . "', '" . $dueDate . "', '" . $status . "')";
+    $sqlTaskInsert = "INSERT INTO `Task` (`task`, `dueDate`, `status`) VALUES ('" . $task . "', '" . $dueDate . "', '" . $status . "')";
     if (mysqli_query($conn, $sqlTaskInsert)) {
-        echo "New record created successfully";
+        $taskId = mysqli_insert_id($conn);
+    $sqlUserInsert = "INSERT INTO `TaskAssigment` (`taskId`, `user1`, `user2`, `user3`) VALUES ('" . $taskId . "', '" . $user[0] . "', '" . $user[1] . "', '" . $user[2] . "')";
+        if (mysqli_query($conn, $sqlUserInsert)) {
+            echo "New record created successfully";
+            echo $taskId;
+        }
+        else{
+            echo "Error: " . mysqli_error($conn);
+        }
     } else {
+        $taskId = mysqli_insert_id($conn);
+        echo $taskId;
         echo "Error: " . mysqli_error($conn);
     }
 }
@@ -107,7 +118,7 @@ function getAllUser($conn)
     };
 }
 
-var_dump($_POST['users[]']);
+//var_dump($_POST['users[]']);
 ?>
 
 
@@ -135,7 +146,7 @@ var_dump($_POST['users[]']);
 
                     <div class="col-sm-12">
                     <br>
-                    <select name="status">
+                    Статус на задачата: <select name="status">
                         <option value="0">Completed</option>
                         <option value="1">In progress</option>
                     </select>
